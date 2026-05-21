@@ -32,7 +32,6 @@ const Logo = styled.div`
   text-shadow: ${theme.shadows.neonGlowText};
   letter-spacing: 2px;
   cursor: pointer;
-
   span { color: ${theme.colors.text}; }
 `;
 
@@ -47,6 +46,37 @@ const Sidebar = styled.aside`
   z-index: 90;
   display: flex;
   flex-direction: column;
+`;
+
+const RoleBadge = styled.div`
+  margin: 0 16px 20px;
+  padding: 8px 14px;
+  background: ${theme.colors.neonFaint};
+  border: 1px solid ${theme.colors.borderDim};
+  border-radius: ${theme.borderRadius.md};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const RoleLabel = styled.span`
+  font-family: ${theme.fonts.mono};
+  font-size: 11px;
+  color: ${theme.colors.neon};
+  letter-spacing: 1px;
+`;
+
+const SwitchBtn = styled.button`
+  background: transparent;
+  border: none;
+  font-size: 10px;
+  color: ${theme.colors.textDim};
+  cursor: pointer;
+  font-family: ${theme.fonts.mono};
+  padding: 0;
+  transition: ${theme.transitions.fast};
+
+  &:hover { color: ${theme.colors.neon}; }
 `;
 
 const NavItem = styled.button`
@@ -73,10 +103,7 @@ const NavItem = styled.button`
   }
 `;
 
-const NavIcon = styled.span`
-  font-size: 18px;
-  line-height: 1;
-`;
+const NavIcon = styled.span`font-size: 18px; line-height: 1;`;
 
 const SidebarFooter = styled.div`
   margin-top: auto;
@@ -106,25 +133,40 @@ const NetworkWarning = styled.div`
   margin-bottom: 24px;
 `;
 
-const NAV_ITEMS = [
-  { key: 'vehicles', icon: '🚗', label: '차량 목록' },
-  { key: 'book',     icon: '📅', label: '예약하기' },
-  { key: 'active',   icon: '🔑', label: '현재 렌탈' },
-  { key: 'register', icon: '✨', label: '차량 등록 (호스트)' },
-];
+const NAV = {
+  renter: [
+    { key: 'vehicles', icon: '🚗', label: '차량 목록' },
+    { key: 'book',     icon: '📅', label: '예약하기' },
+    { key: 'active',   icon: '🔑', label: '현재 렌탈' },
+  ],
+  host: [
+    { key: 'register', icon: '✨', label: '차량 등록 (NFT)' },
+    { key: 'myVehicles', icon: '🚙', label: '내 차량 관리' },
+    { key: 'earnings',   icon: '💰', label: '수익 현황' },
+  ],
+};
 
-export default function Layout({ wallet, currentPage, onNavigate, children }) {
+export default function Layout({ wallet, currentPage, onNavigate, role, onSwitchRole, children }) {
+  const navItems = NAV[role] || NAV.renter;
+
   return (
     <Wrapper>
       <Header>
-        <Logo onClick={() => onNavigate('vehicles')}>
+        <Logo onClick={() => onNavigate(navItems[0].key)}>
           MOBI<span>TRUST</span>
         </Logo>
         <WalletConnect wallet={wallet} />
       </Header>
 
       <Sidebar>
-        {NAV_ITEMS.map(item => (
+        <RoleBadge>
+          <RoleLabel>
+            {role === 'renter' ? '🚗 이용자' : '🏠 호스트'}
+          </RoleLabel>
+          <SwitchBtn onClick={onSwitchRole}>전환 →</SwitchBtn>
+        </RoleBadge>
+
+        {navItems.map(item => (
           <NavItem
             key={item.key}
             $active={currentPage === item.key}
@@ -134,6 +176,7 @@ export default function Layout({ wallet, currentPage, onNavigate, children }) {
             {item.label}
           </NavItem>
         ))}
+
         <SidebarFooter>
           CHAIN: Kaia Kairos<br />
           ID: 1001<br />

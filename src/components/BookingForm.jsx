@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { theme } from '../styles/theme';
 import { useContract } from '../hooks/useContract';
+import InsuranceSelect, { PLANS } from './InsuranceSelect';
 
 const spin = keyframes`
   from { transform: rotate(0deg); }
@@ -154,12 +155,13 @@ const ErrorMsg = styled.p`
 `;
 
 export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate]     = useState('');
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState('');
+  const [startDate,  setStartDate]  = useState('');
+  const [endDate,    setEndDate]    = useState('');
+  const [insurance,  setInsurance]  = useState(PLANS[0]);
+  const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState('');
   // eslint-disable-next-line no-unused-vars
-  const { getCarSharing }         = useContract();
+  const { getCarSharing } = useContract();
 
   if (!vehicle) {
     return (
@@ -172,8 +174,10 @@ export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
   const hours = startDate && endDate
     ? Math.max(0, (new Date(endDate) - new Date(startDate)) / 3600000)
     : 0;
-  const totalHours = Math.ceil(hours);
-  const total = totalHours * vehicle.pricePerHour;
+  const totalHours   = Math.ceil(hours);
+  const rentalFee    = totalHours * vehicle.pricePerHour;
+  const insuranceFee = insurance?.price || 0;
+  const total        = rentalFee + insuranceFee;
 
   const handleBook = async () => {
     if (!wallet.isConnected)    { setError('MetaMask를 먼저 연결해주세요.'); return; }
@@ -193,8 +197,8 @@ export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
       // await tx.wait();
 
       await new Promise(r => setTimeout(r, 1500));
-      addTxLog({ type: 'RESERVE', message: `${vehicle.name} 예약 완료 (${totalHours}시간)`, status: 'success' });
-      onSuccess({ vehicle, startDate, endDate, total });
+      addTxLog({ type: 'RESERVE', message: `${vehicle.name} 예약 완료 (${totalHours}시간 / 보험: ${insurance?.name})`, status: 'success' });
+      onSuccess({ vehicle, startDate, endDate, total, insurance });
     } catch (err) {
       const msg = err.reason || err.message || '트랜잭션 실패';
       setError(msg);
@@ -235,6 +239,11 @@ export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
       </Card>
 
       <Card>
+        <SectionLabel>DAO 보험 선택</SectionLabel>
+        <InsuranceSelect selected={insurance?.key} onChange={setInsurance} />
+      </Card>
+
+      <Card>
         <SectionLabel>결제 요약</SectionLabel>
         <PriceSummary>
           <PriceRow>
@@ -242,8 +251,12 @@ export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
             <PriceValue>{totalHours > 0 ? `${totalHours}시간` : '-'}</PriceValue>
           </PriceRow>
           <PriceRow>
-            <PriceLabel>시간당 요금</PriceLabel>
-            <PriceValue>{vehicle.pricePerHour.toLocaleString()} W-KRW</PriceValue>
+            <PriceLabel>대여 요금</PriceLabel>
+            <PriceValue>{rentalFee > 0 ? `${rentalFee.toLocaleString()} W-KRW` : '-'}</PriceValue>
+          </PriceRow>
+          <PriceRow>
+            <PriceLabel>보험료 ({insurance?.name})</PriceLabel>
+            <PriceValue>{insuranceFee > 0 ? `${insuranceFee.toLocaleString()} W-KRW` : '무료'}</PriceValue>
           </PriceRow>
           <Divider />
           <PriceRow>
