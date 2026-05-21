@@ -158,6 +158,7 @@ export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
   const [endDate, setEndDate]     = useState('');
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
+  // eslint-disable-next-line no-unused-vars
   const { getCarSharing }         = useContract();
 
   if (!vehicle) {

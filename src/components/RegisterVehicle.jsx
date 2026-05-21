@@ -194,6 +194,7 @@ export default function RegisterVehicle({ wallet, addTxLog }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(null);
   const [error, setError]     = useState('');
+  // eslint-disable-next-line no-unused-vars
   const { getVehicleNFT }     = useContract();
 
   const update = (key, val) => setForm(f => ({ ...f, [key]: val }));

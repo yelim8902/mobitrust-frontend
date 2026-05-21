@@ -178,6 +178,7 @@ function useElapsed(startDate) {
 export default function ActiveRental({ rental, wallet, addTxLog, onEnd }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  // eslint-disable-next-line no-unused-vars
   const { getCarSharing }     = useContract();
   const elapsed               = useElapsed(rental?.startDate);
 
