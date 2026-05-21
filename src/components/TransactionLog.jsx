@@ -158,8 +158,9 @@ export default function TransactionLog({ logs }) {
             logs.map(log => (
               <LogEntry key={log.id}>
                 <IconCircle $s={log.status}>
-                  {log.status === 'success' ? '✓' :
-                   log.status === 'error'   ? '✗' : '…'}
+                  {log.status === 'success'
+                    ? (TYPE_ICON[log.type] || '✓')
+                    : log.status === 'error' ? '✗' : '…'}
                 </IconCircle>
                 <LogBody>
                   <LogMessage>{log.message}</LogMessage>
