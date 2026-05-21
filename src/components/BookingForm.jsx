@@ -197,12 +197,12 @@ export default function BookingForm({ vehicle, wallet, addTxLog, onSuccess }) {
       // await tx.wait();
 
       await new Promise(r => setTimeout(r, 1500));
-      addTxLog({ type: 'RESERVE', message: `${vehicle.name} 예약 완료 (${totalHours}시간 / 보험: ${insurance?.name})`, status: 'success' });
+      addTxLog({ type: '예약', message: `${vehicle.name}을(를) ${totalHours}시간 예약했어요 (${insurance?.name} 적용)`, status: 'success' });
       onSuccess({ vehicle, startDate, endDate, total, insurance });
     } catch (err) {
       const msg = err.reason || err.message || '트랜잭션 실패';
       setError(msg);
-      addTxLog({ type: 'RESERVE', message: msg, status: 'error' });
+      addTxLog({ type: '예약', message: `예약 중 문제가 생겼어요: ${msg}`, status: 'error' });
     } finally {
       setLoading(false);
     }

@@ -207,12 +207,12 @@ export default function ActiveRental({ rental, wallet, addTxLog, onEnd }) {
       // await tx.wait();
 
       await new Promise(r => setTimeout(r, 1500));
-      addTxLog({ type: 'SETTLE', message: `${rental.vehicle.name} 정산 완료 — ${rental.total.toLocaleString()} W-KRW`, status: 'success' });
+      addTxLog({ type: '정산', message: `${rental.vehicle.name} 반납 완료! ${rental.total.toLocaleString()} W-KRW가 즉시 정산됐어요`, status: 'success' });
       onEnd();
     } catch (err) {
       const msg = err.reason || err.message || '트랜잭션 실패';
       setError(msg);
-      addTxLog({ type: 'SETTLE', message: msg, status: 'error' });
+      addTxLog({ type: '반납', message: `반납 중 문제가 생겼어요: ${msg}`, status: 'error' });
     } finally {
       setLoading(false);
     }

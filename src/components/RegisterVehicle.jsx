@@ -221,12 +221,12 @@ export default function RegisterVehicle({ wallet, addTxLog }) {
 
       await new Promise(r => setTimeout(r, 1800));
       const mockTokenId = Math.floor(Math.random() * 9999) + 1;
-      addTxLog({ type: 'MINT NFT', message: `${form.make} ${form.model} NFT 발행 완료 — Token #${mockTokenId}`, status: 'success' });
+      addTxLog({ type: 'NFT 발행', message: `${form.make} ${form.model}이(가) 블록체인에 등록됐어요 (Token #${mockTokenId})`, status: 'success' });
       setSuccess({ tokenId: mockTokenId });
     } catch (err) {
       const msg = err.reason || err.message || '트랜잭션 실패';
       setError(msg);
-      addTxLog({ type: 'MINT NFT', message: msg, status: 'error' });
+      addTxLog({ type: 'NFT 발행', message: `등록 중 문제가 생겼어요: ${msg}`, status: 'error' });
     } finally {
       setLoading(false);
     }
